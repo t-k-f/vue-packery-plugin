@@ -1,0 +1,27 @@
+{
+  "name": "vue-packery-plugin",
+  "version": "1.0.1",
+  "description": "a vue.js packery plugin",
+  "main": "packeryPlugin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t-k-f/vue-packery-plugin.git"
+  },
+  "keywords": [
+    "packery",
+    "vue",
+    "plugin"
+  ],
+  "author": "Jan Thoma",
+  "license": "MIT",
+  "dependencies": {
+    "packery": "^2.1.1"
+  },
+  "bugs": {
+    "url": "https://github.com/t-k-f/vue-packery-plugin/issues"
+  },
+  "homepage": "https://github.com/t-k-f/vue-packery-plugin#readme"
+}
