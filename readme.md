@@ -8,14 +8,6 @@ A wrapper for the beloved packery for vue.js
 npm install --save vue-packery-plugin
 ```
 
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
 ### Usage
 
 ```
