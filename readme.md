@@ -8,6 +8,14 @@ A wrapper for the beloved packery for vue.js
 npm install --save vue-packery-plugin
 ```
 
+then
+
+```
+import VuePackeryPlugin from 'vue-packery-plugin'
+
+Vue.use(VuePackeryPlugin)
+```
+
 ### Usage
 
 ```
