@@ -15,16 +15,12 @@ export default packeryPlugin
 packeryPlugin.install = function (Vue, options)
 {
     Vue.directive('packery', {
-        bind (el, binding, vnode)
+        bind (el, binding)
         {
             const packery = new Packery(el, binding.value)
 
-            const packeryDraw = (node) =>
+            const packeryDraw = () =>
             {
-                if (!node.isSameNode(el))
-                {
-                    return
-                }
                 Vue.nextTick(() =>
                 {
                     packery.reloadItems()
@@ -32,19 +28,19 @@ packeryPlugin.install = function (Vue, options)
                 })
             }
 
-            packeryEvents.$on(ADD, (node) =>
+            packeryEvents.$on(ADD, () =>
             {
-                packeryDraw(node)
+                packeryDraw()
             })
 
-            packeryEvents.$on(CHANGE, (node) =>
+            packeryEvents.$on(CHANGE, () =>
             {
-                packeryDraw(node)
+                packeryDraw()
             })
 
-            packeryEvents.$on(REMOVE, (node) =>
+            packeryEvents.$on(REMOVE, () =>
             {
-                packeryDraw(node)
+                packeryDraw()
             })
         }
     })
@@ -52,15 +48,15 @@ packeryPlugin.install = function (Vue, options)
     Vue.directive('packeryItem', {
         inserted (el)
         {
-            packeryEvents.$emit(ADD, el.parentNode)
+            packeryEvents.$emit(ADD)
         },
         componentUpdated (el)
         {
-            packeryEvents.$emit(CHANGE, el.parentNode)
+            packeryEvents.$emit(CHANGE)
         },
-        unbind (el)
+        unbind (el, binding, vnode)
         {
-            packeryEvents.$emit(REMOVE, el.parentNode)
+            packeryEvents.$emit(REMOVE)
         }
     })
 }
