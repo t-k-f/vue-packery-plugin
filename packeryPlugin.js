@@ -1,6 +1,6 @@
 /* eslint-disable brace-style */
 
-import Vue from 'Vue'
+import Vue from 'vue'
 import Packery from 'packery'
 
 const ADD = 'itemAdded'
@@ -17,14 +17,17 @@ packeryPlugin.install = function (Vue, options)
     Vue.directive('packery', {
         bind (el, binding)
         {
-            const packery = new Packery(el, binding.value)
+            //const packery = new Packery(el, binding.value)
+            el.packery = new Packery(el, binding.value);
 
             const packeryDraw = () =>
             {
                 Vue.nextTick(() =>
                 {
-                    packery.reloadItems()
-                    packery.layout()
+                    if(! el.packery) return;
+                    el.packery.reloadItems()
+                    el.packery.layout()
+                    
                 })
             }
 
@@ -42,6 +45,11 @@ packeryPlugin.install = function (Vue, options)
             {
                 packeryDraw()
             })
+
+        },
+        unbind(el){
+            el.packery.destroy();
+            el.packery = null;
         }
     })
 
@@ -55,8 +63,9 @@ packeryPlugin.install = function (Vue, options)
             packeryEvents.$emit(CHANGE)
         },
         unbind (el, binding, vnode)
-        {
+        {               
             packeryEvents.$emit(REMOVE)
         }
+
     })
 }
