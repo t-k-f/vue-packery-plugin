@@ -42,6 +42,11 @@ packeryPlugin.install = function (Vue, options)
             {
                 packeryDraw()
             })
+        },
+        unbind (el)
+        {
+            el.packery.destroy()
+            el.packery = null
         }
     })
 
