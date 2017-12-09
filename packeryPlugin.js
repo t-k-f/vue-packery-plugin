@@ -17,30 +17,34 @@ packeryPlugin.install = function (Vue, options)
     Vue.directive('packery', {
         bind (el, binding)
         {
-            const packery = new Packery(el, binding.value)
+            el.packery = new Packery(el, binding.value)
 
-            const packeryDraw = () =>
+            const packeryDraw = node =>
             {
+                if (!el.packery || !el.isSameNode(node))
+                {
+                    return
+                }
                 Vue.nextTick(() =>
                 {
-                    packery.reloadItems()
-                    packery.layout()
+                    el.packery.reloadItems()
+                    el.packery.layout()
                 })
             }
 
-            packeryEvents.$on(ADD, () =>
+            packeryEvents.$on(ADD, node =>
             {
-                packeryDraw()
+                packeryDraw(node)
             })
 
-            packeryEvents.$on(CHANGE, () =>
+            packeryEvents.$on(CHANGE, node =>
             {
-                packeryDraw()
+                packeryDraw(node)
             })
 
-            packeryEvents.$on(REMOVE, () =>
+            packeryEvents.$on(REMOVE, node =>
             {
-                packeryDraw()
+                packeryDraw(node)
             })
         },
         unbind (el)
@@ -53,15 +57,16 @@ packeryPlugin.install = function (Vue, options)
     Vue.directive('packeryItem', {
         inserted (el)
         {
-            packeryEvents.$emit(ADD)
+            el.packeryNode = el.parentNode
+            packeryEvents.$emit(ADD, el.packeryNode)
         },
         componentUpdated (el)
         {
-            packeryEvents.$emit(CHANGE)
+            packeryEvents.$emit(CHANGE, el.packeryNode)
         },
         unbind (el, binding, vnode)
         {
-            packeryEvents.$emit(REMOVE)
+            packeryEvents.$emit(REMOVE, el.packeryNode)
         }
     })
 }
