@@ -1,6 +1,6 @@
 /* eslint-disable brace-style */
 
-import Vue from 'Vue'
+import Vue from 'vue'
 import Packery from 'packery'
 
 const ADD = 'itemAdded'
