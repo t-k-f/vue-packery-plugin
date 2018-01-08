@@ -49,8 +49,15 @@ packeryPlugin.install = function (Vue, options)
         },
         unbind (el)
         {
-            el.packery.destroy()
-            el.packery = null
+            const poll = setInterval(() =>
+            {
+                if(!document.contains(el))
+                {
+                    el.packery.destroy()
+                    el.packery = null
+                    clearTimeout(poll)
+                }
+            }, 1000)
         }
     })
 
