@@ -17,7 +17,15 @@ packeryPlugin.install = function (Vue, options)
     Vue.directive('packery', {
         bind (el, binding)
         {
+            /* Batch Timeout */
+
+            var batchTimeout = null
+
+            /* Packery DOM Reference */
+
             el.packery = new Packery(el, binding.value)
+
+            /* Redraw Packery */
 
             const packeryDraw = node =>
             {
@@ -32,19 +40,32 @@ packeryPlugin.install = function (Vue, options)
                 })
             }
 
+            /* Batch Events */
+
+            const batchEvents = node =>
+            {
+                clearTimeout(batchTimeout)
+                batchTimeout = setTimeout(() =>
+                {
+                    packeryDraw(node)
+                }, 1)
+            }
+
+            /* Redraw Handlers */
+
             packeryEvents.$on(ADD, node =>
             {
-                packeryDraw(node)
+                batchEvents(node)
             })
 
             packeryEvents.$on(CHANGE, node =>
             {
-                packeryDraw(node)
+                batchEvents(node)
             })
 
             packeryEvents.$on(REMOVE, node =>
             {
-                packeryDraw(node)
+                batchEvents(node)
             })
         },
         unbind (el)
