@@ -39,7 +39,7 @@ All the packery events are emitted you can make use of it the following Way:
 ### Manually trigger layout
 
 ```
-import {packeryEvents} from 'vue-packery-plugin/src
+import {packeryEvents} from 'vue-packery-plugin'
 
 ...
 
