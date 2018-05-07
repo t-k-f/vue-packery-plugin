@@ -27,3 +27,21 @@ Vue.use(VuePackeryPlugin)
 
 </div>
 ```
+
+### Receive events
+
+All the packery events are emitted you can make use of it the following Way:
+
+```
+<div v-packery='{itemSelector: ".packery-item", percentPosition: true}' @layoutComplete='doStuff()'>
+```
+
+### Manually trigger layout
+
+```
+import {packeryEvents} from 'vue-packery-plugin/src
+
+...
+
+packeryEvents.$emit('layout', MY_PACKERY_EL)
+```

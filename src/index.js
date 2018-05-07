@@ -6,16 +6,17 @@ import Packery from 'packery'
 const ADD = 'itemAdded'
 const CHANGE = 'itemChange'
 const REMOVE = 'itemRemoved'
+const LAYOUT = 'layout'
 
-const packeryEvents = new Vue({})
 const packeryPlugin = () => {}
 
 export default packeryPlugin
+export const packeryEvents = new Vue({})
 
 packeryPlugin.install = function (Vue, options)
 {
     Vue.directive('packery', {
-        bind (el, binding)
+        bind (el, binding, vnode)
         {
             /* Batch Timeout */
 
@@ -39,6 +40,32 @@ packeryPlugin.install = function (Vue, options)
                     el.packery.layout()
                 })
             }
+
+            const packeryEmit = (name, eventObj) =>
+            {
+                if (vnode.componentInstance)
+                {
+                    vnode.componentInstance.$emit(name, eventObj)
+                    return
+                }
+
+                vnode.elm.dispatchEvent(new CustomEvent(name, eventObj))
+            }
+
+            el.packery.on('layoutComplete', (event, laidOutItems) =>
+            {
+                packeryEmit('layoutComplete', {event: event, laidOutItems: laidOutItems})
+            })
+
+            el.packery.on('dragItemPositioned', (event, draggedItem) =>
+            {
+                packeryEmit('dragItemPositioned', {event: event, draggedItem: draggedItem})
+            })
+
+            el.packery.on('fitComplete', (event, item) =>
+            {
+                packeryEmit('fitComplete', {event: event, item: item})
+            })
 
             /* Batch Events */
 
@@ -64,6 +91,11 @@ packeryPlugin.install = function (Vue, options)
             })
 
             packeryEvents.$on(REMOVE, node =>
+            {
+                batchEvents(node)
+            })
+
+            packeryEvents.$on(LAYOUT, node =>
             {
                 batchEvents(node)
             })
