@@ -120,7 +120,7 @@ packeryPlugin.install = function (Vue, options)
             el.packeryNode = el.parentNode
             packeryEvents.$emit(ADD, el.packeryNode)
         },
-        componentUpdated (el)
+        updated (el)
         {
             packeryEvents.$emit(CHANGE, el.packeryNode)
         },
