@@ -1,7 +1,7 @@
 /* eslint-disable brace-style */
 
 import Vue from 'vue'
-import Packery from 'packery/dist/packery/packery.pkgd.min.js'
+import Packery from 'packery/dist/packery.pkgd.min.js'
 
 const ADD = 'itemAdded'
 const CHANGE = 'itemChange'
