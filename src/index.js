@@ -1,7 +1,7 @@
 /* eslint-disable brace-style */
 
 import Vue from 'vue'
-import Packery from 'packery'
+import 'packery/dist/packery'
 
 const ADD = 'itemAdded'
 const CHANGE = 'itemChange'
@@ -117,7 +117,7 @@ packeryPlugin.install = function (Vue, options)
         {
             const poll = setInterval(() =>
             {
-                if(!document.contains(el))
+                if(!document.body.contains(el))
                 {
                     el.packery.destroy()
                     el.packery = null
