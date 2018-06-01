@@ -1,32 +1,17 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.packeryEvents = undefined;
-
-var _vue = require('vue');
-
-var _vue2 = _interopRequireDefault(_vue);
-
-var _packery = require('packery');
-
-var _packery2 = _interopRequireDefault(_packery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /* eslint-disable brace-style */
 
-var ADD = 'itemAdded';
-var CHANGE = 'itemChange';
-var REMOVE = 'itemRemoved';
-var LAYOUT = 'layout';
+import Vue from 'vue'
+import Packery from 'packery/dist/packery/packery.pkgd.min.js'
 
-var packeryPlugin = function packeryPlugin() {};
+const ADD = 'itemAdded'
+const CHANGE = 'itemChange'
+const REMOVE = 'itemRemoved'
+const LAYOUT = 'layout'
 
-exports.default = packeryPlugin;
-var packeryEvents = exports.packeryEvents = new _vue2.default({});
+const packeryPlugin = () => {}
 
+export default packeryPlugin
+export const packeryEvents = new Vue({})
 
 /* IE polyfill */
 
@@ -41,100 +26,120 @@ function CustomEvent(event, params)
 CustomEvent.prototype = window.Event.prototype;
 window.CustomEvent = CustomEvent;
 
-/* Plugin */
-
-packeryPlugin.install = function (Vue, options) {
+packeryPlugin.install = function (Vue, options)
+{
     Vue.directive('packery', {
-        bind: function bind(el, binding, vnode) {
+        bind (el, binding, vnode)
+        {
             /* Batch Timeout */
 
-            var batchTimeout = null;
+            var batchTimeout = null
 
             /* Packery DOM Reference */
 
-            var packery = new _packery2.default(el, binding.value);
+            el.packery = new Packery(el, binding.value)
 
             /* Redraw Packery */
 
-            var packeryDraw = function packeryDraw(node) {
-                if (!el.isSameNode(node)) {
-                    return;
+            const packeryDraw = node =>
+            {
+                if (!el.packery || !el.isSameNode(node))
+                {
+                    return
                 }
-                Vue.nextTick(function () {
-                    packery.reloadItems();
-                    packery.layout();
-                });
-            };
+                Vue.nextTick(() =>
+                {
+                    el.packery.reloadItems()
+                    el.packery.layout()
+                })
+            }
 
-            var packeryEmit = function packeryEmit(name, eventObj) {
-                if (vnode.componentInstance) {
-                    vnode.componentInstance.$emit(name, eventObj);
-                    return;
+            const packeryEmit = (name, eventObj) =>
+            {
+                if (vnode.componentInstance)
+                {
+                    vnode.componentInstance.$emit(name, eventObj)
+                    return
                 }
 
-                vnode.elm.dispatchEvent(new CustomEvent(name, eventObj));
-            };
+                vnode.elm.dispatchEvent(new CustomEvent(name, eventObj))
+            }
 
-            packery.on('layoutComplete', function (event, laidOutItems) {
-                packeryEmit('layoutComplete', { event: event, laidOutItems: laidOutItems });
-            });
+            el.packery.on('layoutComplete', (event, laidOutItems) =>
+            {
+                packeryEmit('layoutComplete', {event: event, laidOutItems: laidOutItems})
+            })
 
-            packery.on('dragItemPositioned', function (event, draggedItem) {
-                packeryEmit('dragItemPositioned', { event: event, draggedItem: draggedItem });
-            });
+            el.packery.on('dragItemPositioned', (event, draggedItem) =>
+            {
+                packeryEmit('dragItemPositioned', {event: event, draggedItem: draggedItem})
+            })
 
-            packery.on('fitComplete', function (event, item) {
-                packeryEmit('fitComplete', { event: event, item: item });
-            });
+            el.packery.on('fitComplete', (event, item) =>
+            {
+                packeryEmit('fitComplete', {event: event, item: item})
+            })
 
             /* Batch Events */
 
-            var batchEvents = function batchEvents(node) {
-                clearTimeout(batchTimeout);
-                batchTimeout = setTimeout(function () {
-                    packeryDraw(node);
-                }, 1);
-            };
+            const batchEvents = node =>
+            {
+                clearTimeout(batchTimeout)
+                batchTimeout = setTimeout(() =>
+                {
+                    packeryDraw(node)
+                }, 1)
+            }
 
             /* Redraw Handlers */
 
-            packeryEvents.$on(ADD, function (node) {
-                batchEvents(node);
-            });
+            packeryEvents.$on(ADD, node =>
+            {
+                batchEvents(node)
+            })
 
-            packeryEvents.$on(CHANGE, function (node) {
-                batchEvents(node);
-            });
+            packeryEvents.$on(CHANGE, node =>
+            {
+                batchEvents(node)
+            })
 
-            packeryEvents.$on(REMOVE, function (node) {
-                batchEvents(node);
-            });
+            packeryEvents.$on(REMOVE, node =>
+            {
+                batchEvents(node)
+            })
 
-            packeryEvents.$on(LAYOUT, function (node) {
-                batchEvents(node);
-            });
+            packeryEvents.$on(LAYOUT, node =>
+            {
+                batchEvents(node)
+            })
         },
-        unbind: function unbind(el) {
-            var poll = setInterval(function () {
-                if (!document.contains(el)) {
-                    el.packery.destroy();
-                    el.packery = null;
-                    clearTimeout(poll);
+        unbind (el)
+        {
+            const poll = setInterval(() =>
+            {
+                if(!document.contains(el))
+                {
+                    el.packery.destroy()
+                    el.packery = null
+                    clearTimeout(poll)
                 }
-            }, 1000);
+            }, 1000)
         }
-    });
+    })
 
     Vue.directive('packeryItem', {
-        inserted: function inserted(el) {
-            el.packeryNode = el.parentNode;
-            packeryEvents.$emit(ADD, el.packeryNode);
+        inserted (el)
+        {
+            el.packeryNode = el.parentNode
+            packeryEvents.$emit(ADD, el.packeryNode)
         },
-        updated: function updated(el) {
-            packeryEvents.$emit(CHANGE, el.packeryNode);
+        componentUpdated (el)
+        {
+            packeryEvents.$emit(CHANGE, el.packeryNode)
         },
-        unbind: function unbind(el, binding, vnode) {
-            packeryEvents.$emit(REMOVE, el.packeryNode);
+        unbind (el, binding, vnode)
+        {
+            packeryEvents.$emit(REMOVE, el.packeryNode)
         }
-    });
-};
+    })
+}
