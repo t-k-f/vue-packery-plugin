@@ -41,12 +41,8 @@ packeryPlugin.install = function (Vue, options)
 
             /* Redraw Packery */
 
-            const packeryDraw = node =>
+            const packeryDraw = () =>
             {
-                if (!el.packery || !el.isSameNode(node))
-                {
-                    return
-                }
                 Vue.nextTick(() =>
                 {
                     el.packery.reloadItems()
@@ -84,10 +80,15 @@ packeryPlugin.install = function (Vue, options)
 
             const batchEvents = node =>
             {
+                if (!el.packery || !el.isSameNode(node))
+                {
+                    return
+                }
+
                 clearTimeout(batchTimeout)
                 batchTimeout = setTimeout(() =>
                 {
-                    packeryDraw(node)
+                    packeryDraw()
                 }, 1)
             }
 
