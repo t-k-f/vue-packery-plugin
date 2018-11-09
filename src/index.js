@@ -2,6 +2,7 @@
 
 import Vue from 'vue'
 import Packery from 'packery'
+import Draggabilly from 'draggabilly';
 
 const ADD = 'itemAdded'
 const CHANGE = 'itemChange'
@@ -41,13 +42,40 @@ packeryPlugin.install = function (Vue, options)
 
             /* Redraw Packery */
 
-            const packeryDraw = () =>
+            const packeryDraw = (node, args) =>
             {
+                if (!el.packery || !el.isSameNode(node))
+                {
+                    return
+                }
                 Vue.nextTick(() =>
                 {
                     el.packery.reloadItems()
                     el.packery.layout()
+                    if (args && args.draggable) {
+                        var itemElems = el.packery.getItemElements();
+                        // make items draggable
+                        for (var i = 0, len = itemElems.length; i < len; i++) {
+                            if (args.draggable === true)
+                                addDraggable(itemElems[i]);
+                            else
+                                addDraggable(itemElems[i], args.draggable);
+                        }
+                    }
                 })
+            }
+
+            const addDraggable = (item, args = {}) => {
+                if (item.draggabilly)
+                {
+                    el.packery.unbindDraggabillyEvents(item.draggabilly);
+                }
+                var draggable = new Draggabilly(item, args);
+                item.draggabilly = draggable;
+                el.packery.bindDraggabillyEvents(draggable);
+                draggable.on('staticClick', function(event, pointer) {
+                    emit(vnode, 'itemClicked', {event: event, element: draggable.element})
+                });
             }
 
             const packeryEmit = (name, eventObj) =>
@@ -78,40 +106,35 @@ packeryPlugin.install = function (Vue, options)
 
             /* Batch Events */
 
-            const batchEvents = node =>
+            const batchEvents = (node, args) =>
             {
-                if (!el.packery || !el.isSameNode(node))
-                {
-                    return
-                }
-
                 clearTimeout(batchTimeout)
                 batchTimeout = setTimeout(() =>
                 {
-                    packeryDraw()
+                    packeryDraw(node, args)
                 }, 1)
             }
 
             /* Redraw Handlers */
 
-            packeryEvents.$on(ADD, node =>
+            packeryEvents.$on(ADD, (node, args) =>
             {
-                batchEvents(node)
+                batchEvents(node, args)
             })
 
-            packeryEvents.$on(CHANGE, node =>
+            packeryEvents.$on(CHANGE, (node, args) =>
             {
-                batchEvents(node)
+                batchEvents(node, args)
             })
 
-            packeryEvents.$on(REMOVE, node =>
+            packeryEvents.$on(REMOVE, (node, args) =>
             {
-                batchEvents(node)
+                batchEvents(node, args)
             })
 
-            packeryEvents.$on(LAYOUT, node =>
+            packeryEvents.$on(LAYOUT, (node, args) =>
             {
-                batchEvents(node)
+                batchEvents(node, args)
             })
         },
         unbind (el)
@@ -129,18 +152,21 @@ packeryPlugin.install = function (Vue, options)
     })
 
     Vue.directive('packeryItem', {
-        inserted (el)
+        inserted (el, binding, vnode)
         {
             el.packeryNode = el.parentNode
-            packeryEvents.$emit(ADD, el.packeryNode)
+            var args = Object.assign({ 'vnode': vnode }, binding.value);
+            packeryEvents.$emit(ADD, el.packeryNode, args)
         },
-        componentUpdated (el)
+        componentUpdated (el, binding, vnode)
         {
-            packeryEvents.$emit(CHANGE, el.packeryNode)
+            var args = Object.assign({ 'vnode': vnode }, binding.value);
+            packeryEvents.$emit(CHANGE, el.packeryNode, args)
         },
         unbind (el, binding, vnode)
         {
-            packeryEvents.$emit(REMOVE, el.packeryNode)
+            var args = Object.assign({ 'vnode': vnode }, binding.value);
+            packeryEvents.$emit(REMOVE, el.packeryNode, args)
         }
     })
 }

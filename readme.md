@@ -45,3 +45,14 @@ import {packeryEvents} from 'vue-packery-plugin'
 
 packeryEvents.$emit('layout', MY_PACKERY_EL)
 ```
+
+### Draggabilly
+
+```
+<div v-packery-item='{draggable: true}' class='packery-item'></div>
+```
+
+Passing options
+```
+<div v-packery-item='{draggable: {handle: ".handle"}}' class='packery-item'></div>
+```
