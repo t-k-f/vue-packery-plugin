@@ -7,6 +7,7 @@ const ADD = 'itemAdded'
 const CHANGE = 'itemChange'
 const REMOVE = 'itemRemoved'
 const LAYOUT = 'layout'
+const DRAGGIE = 'draggie'
 
 const packeryPlugin = () => {}
 
@@ -35,9 +36,18 @@ packeryPlugin.install = function (Vue, options)
 
             el.packery = new Packery(el, binding.value)
 
-            /* Set init layout option */
+            /* init layout option */
 
             var initLayout = (typeof el.packery.options.initLayout) ? el.packery.options.initLayout : true
+
+            /* init layout done? */
+
+            var initLayoutDone = false
+
+            /*Node List */
+
+            var addNodes = []
+            var removeNodes = []
 
             /* Batch Timeout */
 
@@ -54,8 +64,29 @@ packeryPlugin.install = function (Vue, options)
 
                 Vue.nextTick(() =>
                 {
-                    el.packery.reloadItems()
-                    el.packery.layout()
+                    if (!initLayoutDone)
+                    {
+                        el.packery.layout()
+                    }
+
+                    if (initLayoutDone && (!addNodes.length && !removeNodes.length))
+                    {
+                        el.packery.shiftLayout()
+                    }
+
+                    if (initLayoutDone && removeNodes.length)
+                    {
+                        el.packery.remove(removeNodes)
+                        el.packery.shiftLayout()
+                    }
+
+                    if (initLayoutDone && addNodes.length)
+                    {
+                        el.packery.appended(addNodes)
+                    }
+
+                    addNodes = []
+                    removeNodes = []
                 })
             }
 
@@ -72,6 +103,8 @@ packeryPlugin.install = function (Vue, options)
 
             el.packery.on('layoutComplete', (event, laidOutItems) =>
             {
+                initLayoutDone = true
+
                 packeryEmit('layoutComplete', {event: event, laidOutItems: laidOutItems})
             })
 
@@ -87,11 +120,21 @@ packeryPlugin.install = function (Vue, options)
 
             /* Batch Events */
 
-            const batchEvents = node =>
+            const batchEvents = event =>
             {
-                if (!el.packery || !el.isSameNode(node))
+                if (!el.packery || !el.isSameNode(event.node))
                 {
                     return
+                }
+
+                if (event.type === 'add')
+                {
+                    addNodes.push(event.item)
+                }
+
+                if (event.type === 'remove')
+                {
+                    removeNodes.push(event.item)
                 }
 
                 clearTimeout(batchTimeout)
@@ -103,26 +146,34 @@ packeryPlugin.install = function (Vue, options)
 
             /* Redraw Handlers */
 
-            packeryEvents.$on(ADD, node =>
+            packeryEvents.$on(ADD, event =>
             {
-                batchEvents(node)
+                batchEvents(event)
             })
 
-            packeryEvents.$on(CHANGE, node =>
+            packeryEvents.$on(CHANGE, event =>
             {
-                batchEvents(node)
+                batchEvents(event)
             })
 
-            packeryEvents.$on(REMOVE, node =>
+            packeryEvents.$on(REMOVE, event =>
             {
-                batchEvents(node)
+                batchEvents(event)
             })
 
-            packeryEvents.$on(LAYOUT, node =>
+            packeryEvents.$on(LAYOUT, event =>
             {
-                initLayout = true
+                batchEvents(event)
+            })
 
-                batchEvents(node)
+            packeryEvents.$on(DRAGGIE, event =>
+            {
+                if (!el.isSameNode(event.node))
+                {
+                    return
+                }
+
+                el.packery.bindDraggabillyEvents(event.draggie)
             })
         },
         unbind (el)
@@ -143,15 +194,15 @@ packeryPlugin.install = function (Vue, options)
         inserted (el)
         {
             el.packeryNode = el.parentNode
-            packeryEvents.$emit(ADD, el.packeryNode)
+            packeryEvents.$emit(ADD, {node: el.packeryNode, item: el, type: 'add'})
         },
         componentUpdated (el)
         {
-            packeryEvents.$emit(CHANGE, el.packeryNode)
+            packeryEvents.$emit(CHANGE, {node: el.packeryNode, item: el, type: 'change'})
         },
         unbind (el, binding, vnode)
         {
-            packeryEvents.$emit(REMOVE, el.packeryNode)
+            packeryEvents.$emit(REMOVE, {node: el.packeryNode, item: el, type: 'remove'})
         }
     })
 }
