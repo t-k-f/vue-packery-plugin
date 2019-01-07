@@ -45,3 +45,6 @@ import {packeryEvents} from 'vue-packery-plugin'
 
 packeryEvents.$emit('layout', MY_PACKERY_EL)
 ```
+### Draggabilly
+
+[https://github.com/t-k-f/vue-draggabilly-plugin](https://github.com/t-k-f/vue-draggabilly-plugin)
