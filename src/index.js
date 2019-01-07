@@ -17,7 +17,7 @@ export const packeryEvents = new Vue({})
 
 function CustomEvent(event, params)
 {
-    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    params = params || {bubbles: false, cancelable: false, detail: undefined};
     var evt = document.createEvent('CustomEvent');
     evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
     return evt;
@@ -31,18 +31,27 @@ packeryPlugin.install = function (Vue, options)
     Vue.directive('packery', {
         bind (el, binding, vnode)
         {
-            /* Batch Timeout */
-
-            var batchTimeout = null
-
             /* Packery DOM Reference */
 
             el.packery = new Packery(el, binding.value)
+
+            /* Set init layout option */
+
+            var initLayout = (typeof el.packery.options.initLayout) ? el.packery.options.initLayout : true
+
+            /* Batch Timeout */
+
+            var batchTimeout = null
 
             /* Redraw Packery */
 
             const packeryDraw = () =>
             {
+                if (!initLayout)
+                {
+                    return
+                }
+
                 Vue.nextTick(() =>
                 {
                     el.packery.reloadItems()
@@ -111,6 +120,8 @@ packeryPlugin.install = function (Vue, options)
 
             packeryEvents.$on(LAYOUT, node =>
             {
+                initLayout = true
+
                 batchEvents(node)
             })
         },
