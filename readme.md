@@ -47,6 +47,4 @@ packeryEvents.$emit('layout', MY_PACKERY_EL)
 ```
 ### Draggabilly
 
-If you need draggabilly support follow instructions here
-
-[https://github.com/t-k-f/vue-draggabilly-plugin](https://github.com/t-k-f/vue-draggabilly-plugin)
+If you need draggabilly support follow instructions here [Vue.js Packery Draggabilly Plugin](https://github.com/t-k-f/vue-draggabilly-plugin).
