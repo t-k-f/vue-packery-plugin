@@ -4,9 +4,9 @@
 
         <div v-packery='{itemSelector: ".packery-item", percentPosition: true}' class='packery-container'>
 
-            <div v-for='(item, index) in items' :key='item.id' v-packery-item class='packery-item' :style='{height: item.height + "rem"}'>
+            <div v-for='(item, index) in items' :key='index' v-packery-item class='packery-item' :style='{height: item.height + "rem"}'>
 
-                <span>{{ index }}</span>
+                <span>{{ item.id }}</span>
 
                 <input type='button' value='Remove' @click='setRemoveItem(index)'>
 
@@ -14,7 +14,13 @@
 
         </div>
 
-        <input type="button" value="Add Item" @click='setAddItem()'>
+        <div class='controls'>
+
+            <input type="button" value="Add Item" @click='setAddItem()'>
+
+            <input type="button" value="Shuffle Items" @click='setShuffleItems()'>
+
+        </div>
 
     </div>
 
@@ -45,20 +51,23 @@ module.exports = {
 
             return Math.round(rand * 20) + 5
         },
-        setId ()
-        {
-            return Math.random().toString(36).substr(2, 9)
-        },
         setAddItem ()
         {
             this.items.push({
-                id: this.setId(),
+                id: this.items.length + 1,
                 height: this.setHeight()
             })
         },
         setRemoveItem (index)
         {
             this.items.splice(index, 1)
+        },
+        setShuffleItems ()
+        {
+            this.items.sort(() =>
+            {
+                return 0.5 - Math.random()
+            })
         }
     }
 }
@@ -89,30 +98,29 @@ module.exports = {
     display: block;
     font-size: 1.4rem;
     color: #f4be41;
+    margin-bottom: 1rem;
 }
 
-.packery-item:nth-child(1) {
-    height: 10rem;
+.packery-item input{
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.5rem;
+    background-color: #f4be41;
+    border: none;
 }
 
-.packery-item:nth-child(2) {
-    height: 5rem;
+.controls {
+    margin-top: 2rem;
+    text-align: center;
 }
 
-.packery-item:nth-child(3) {
-    height: 15rem;
-}
-
-.packery-item:nth-child(4) {
-    height: 20rem;
-}
-
-.packery-item:nth-child(5) {
-    height: 5rem;
-}
-
-.packery-item:nth-child(6) {
-    height: 10rem;
+.controls input {
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.5rem;
+    background-color: #444;
+    border: none;
+    margin: 0 1rem;
 }
 
 </style>
