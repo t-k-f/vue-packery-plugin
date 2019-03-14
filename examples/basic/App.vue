@@ -2,7 +2,7 @@
 
     <div>
 
-        <div v-packery='{itemSelector: ".packery-item", percentPosition: true}' class='packery-container'>
+        <div v-packery='{itemSelector: ".packery-item", percentPosition: true, initLayout: false}' class='packery-container' ref='packery'>
 
             <div v-for='(item, index) in items' :key='index' v-packery-item class='packery-item' :style='{height: item.height + "rem"}'>
 
@@ -20,6 +20,8 @@
 
             <input type="button" value="Shuffle Items" @click='setShuffleItems()'>
 
+            <input type="button" value="Init Layout" @click='setInitLayout()'>
+
         </div>
 
     </div>
@@ -27,6 +29,8 @@
 </template>
 
 <script>
+
+import {packeryEvents} from '../../src/index.js'
 
 module.exports = {
     name: 'App',
@@ -68,6 +72,10 @@ module.exports = {
             {
                 return 0.5 - Math.random()
             })
+        },
+        setInitLayout ()
+        {
+            packeryEvents.$emit('layout', this.$refs.packery)
         }
     }
 }
