@@ -66,23 +66,26 @@ packeryPlugin.install = function (Vue, options)
                 {
                     if (!initLayoutDone)
                     {
+                        el.packery.reloadItems()
                         el.packery.layout()
                     }
 
-                    if (initLayoutDone && (!addNodes.length && !removeNodes.length))
+                    else if (initLayoutDone && (!addNodes.length && !removeNodes.length))
                     {
-                        el.packery.shiftLayout()
+                        el.packery.layout()
                     }
 
-                    if (initLayoutDone && removeNodes.length)
+                    else if (initLayoutDone && removeNodes.length)
                     {
                         el.packery.remove(removeNodes)
                         el.packery.shiftLayout()
                     }
 
-                    if (initLayoutDone && addNodes.length)
+                    else if (initLayoutDone && addNodes.length)
                     {
+                        console.log(addNodes)
                         el.packery.appended(addNodes)
+                        el.packery.shiftLayout()
                     }
 
                     addNodes = []
@@ -127,6 +130,11 @@ packeryPlugin.install = function (Vue, options)
                     return
                 }
 
+                if (event.type == 'layout')
+                {
+                    initLayout = true
+                }
+
                 if (event.type === 'add')
                 {
                     addNodes.push(event.item)
@@ -163,6 +171,8 @@ packeryPlugin.install = function (Vue, options)
 
             packeryEvents.$on(LAYOUT, event =>
             {
+                event = {node: event, type: 'layout'}
+
                 batchEvents(event)
             })
 
