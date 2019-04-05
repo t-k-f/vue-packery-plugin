@@ -83,7 +83,6 @@ packeryPlugin.install = function (Vue, options)
 
                     else if (initLayoutDone && addNodes.length)
                     {
-                        console.log(addNodes)
                         el.packery.appended(addNodes)
                         el.packery.shiftLayout()
                     }

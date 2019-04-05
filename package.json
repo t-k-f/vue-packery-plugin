@@ -1,6 +1,6 @@
 {
   "name": "vue-packery-plugin",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "a vue.js packery plugin",
   "main": "./dist/build.js",
   "scripts": {
