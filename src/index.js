@@ -72,12 +72,7 @@ packeryPlugin.install = function (Vue, options)
                         el.packery.layout()
                     }
 
-                    else if (initLayoutDone && (!addNodes.length && !removeNodes.length) && initShiftLayout)
-                    {
-                        el.packery.shiftLayout()
-                    }
-
-                    else if (initLayoutDone && (!addNodes.length && !removeNodes.length))
+                    else if (initLayoutDone && (!addNodes.length && !removeNodes.length && !initShiftLayout))
                     {
                         el.packery.layout()
                     }
@@ -85,12 +80,15 @@ packeryPlugin.install = function (Vue, options)
                     else if (initLayoutDone && removeNodes.length)
                     {
                         el.packery.remove(removeNodes)
-                        el.packery.shiftLayout()
                     }
 
                     else if (initLayoutDone && addNodes.length)
                     {
                         el.packery.appended(addNodes)
+                    }
+
+                    else if (initLayoutDone && initShiftLayout || (addNodes.length || removeNodes.length))
+                    {
                         el.packery.shiftLayout()
                     }
 
