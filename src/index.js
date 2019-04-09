@@ -7,6 +7,7 @@ const ADD = 'itemAdded'
 const CHANGE = 'itemChange'
 const REMOVE = 'itemRemoved'
 const LAYOUT = 'layout'
+const SHIFTLAYOUT = 'shiftLayout'
 const DRAGGIE = 'draggie'
 
 const packeryPlugin = () => {}
@@ -39,6 +40,7 @@ packeryPlugin.install = function (Vue, options)
             /* init layout option */
 
             var initLayout = (typeof el.packery.options.initLayout) ? el.packery.options.initLayout : true
+            var initShiftLayout = (typeof el.packery.options.initShiftLayout) ? el.packery.options.initShiftLayout : true
 
             /* init layout done? */
 
@@ -68,6 +70,11 @@ packeryPlugin.install = function (Vue, options)
                     {
                         el.packery.reloadItems()
                         el.packery.layout()
+                    }
+
+                    else if (initLayoutDone && (!addNodes.length && !removeNodes.length) && initShiftLayout)
+                    {
+                        el.packery.shiftLayout()
                     }
 
                     else if (initLayoutDone && (!addNodes.length && !removeNodes.length))
@@ -134,6 +141,12 @@ packeryPlugin.install = function (Vue, options)
                     initLayout = true
                 }
 
+                if (event.type == 'shiftLayout')
+                {
+                    initLayout = true
+                    initShiftLayout = true
+                }
+
                 if (event.type === 'add')
                 {
                     addNodes.push(event.item)
@@ -171,6 +184,13 @@ packeryPlugin.install = function (Vue, options)
             packeryEvents.$on(LAYOUT, event =>
             {
                 event = {node: event, type: 'layout'}
+
+                batchEvents(event)
+            })
+
+            packeryEvents.$on(SHIFTLAYOUT, event =>
+            {
+                event = {node: event, type: 'shiftLayout'}
 
                 batchEvents(event)
             })
