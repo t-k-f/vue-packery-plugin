@@ -1,3 +1,7 @@
+This plugin is no longer maintained, in consideration that packery doesn't play very nice with Vue. Development of a "native" bin packer will continue here => [vue-binpacker-plugin](https://github.com/t-k-f/vue-binpacker-plugin).
+
+
+
 # Vue.js Packery Plugin
 
 A wrapper for the beloved packery for vue.js
